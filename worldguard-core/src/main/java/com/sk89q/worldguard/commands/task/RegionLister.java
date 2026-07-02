@@ -22,6 +22,7 @@ package com.sk89q.worldguard.commands.task;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.sk89q.minecraft.util.commands.CommandException;
+import com.sk89q.worldguard.util.MessageBundle;
 import com.sk89q.worldguard.util.profile.Profile;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.util.Location;
@@ -129,18 +130,19 @@ public class RegionLister implements Callable<Integer> {
                 if (uniqueId == null) {
                     Profile profile;
 
+                    MessageBundle messages = WorldGuard.getInstance().getMessages();
                     try {
                         profile = WorldGuard.getInstance().getProfileService().findByName(name);
                     } catch (IOException e) {
                         log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
-                        throw new CommandException("Failed to lookup the UUID of '" + name + "'");
+                        throw new CommandException(messages.format("commands.region.list.lookup-failed", "name", name));
                     } catch (InterruptedException e) {
                         log.log(Level.WARNING, "Failed UUID lookup of '" + name + "'", e);
-                        throw new CommandException("The lookup the UUID of '" + name + "' was interrupted");
+                        throw new CommandException(messages.format("commands.region.list.lookup-interrupted", "name", name));
                     }
 
                     if (profile == null) {
-                        throw new CommandException("A user by the name of '" + name + "' does not seem to exist.");
+                        throw new CommandException(messages.format("commands.region.list.user-not-exist", "name", name));
                     }
 
                     uniqueId = profile.getUniqueId();

@@ -31,6 +31,7 @@ import com.sk89q.worldguard.LocalPlayer;
 import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.session.Session;
 import com.sk89q.worldguard.session.handler.GodMode;
+import com.sk89q.worldguard.util.MessageBundle;
 
 public class GeneralCommands {
     private final WorldGuard worldGuard;
@@ -42,6 +43,7 @@ public class GeneralCommands {
     @Command(aliases = {"god"}, usage = "[player]",
             desc = "Enable godmode on a player", flags = "s", max = 1)
     public void god(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
+        MessageBundle messages = worldGuard.getMessages();
         Iterable<? extends LocalPlayer> targets = null;
         boolean included = false;
         
@@ -66,27 +68,28 @@ public class GeneralCommands {
 
                 // Tell the user
                 if (player.equals(sender)) {
-                    player.print("God mode enabled! Use /ungod to disable.");
+                    player.print(messages.get("commands.god.self"));
 
                     // Keep track of this
                     included = true;
                 } else if (!args.hasFlag('s')) {
-                    player.print("God enabled by " + sender.getDisplayName() + ".");
+                    player.print(messages.format("commands.god.by-other", "actor", sender.getDisplayName()));
 
                 }
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included) {
-            sender.print("Players now have god mode.");
+            sender.print(messages.get("commands.god.others"));
         }
     }
     
     @Command(aliases = {"ungod"}, usage = "[player]",
             desc = "Disable godmode on a player", flags = "s", max = 1)
     public void ungod(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
+        MessageBundle messages = worldGuard.getMessages();
         Iterable<? extends LocalPlayer> targets;
         boolean included = false;
         
@@ -109,27 +112,28 @@ public class GeneralCommands {
             if (GodMode.set(player, session, false)) {
                 // Tell the user
                 if (player.equals(sender)) {
-                    player.print("God mode disabled!");
+                    player.print(messages.get("commands.ungod.self"));
 
                     // Keep track of this
                     included = true;
                 } else if (!args.hasFlag('s')) {
-                    player.print("God disabled by " + sender.getDisplayName() + ".");
+                    player.print(messages.format("commands.ungod.by-other", "actor", sender.getDisplayName()));
 
                 }
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included) {
-            sender.print("Players no longer have god mode.");
+            sender.print(messages.get("commands.ungod.others"));
         }
     }
     
     @Command(aliases = {"heal"}, usage = "[player]", desc = "Heal a player", flags = "s", max = 1)
     public void heal(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
 
+        MessageBundle messages = worldGuard.getMessages();
         Iterable<? extends LocalPlayer> targets = null;
         boolean included = false;
         
@@ -154,26 +158,27 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.print("Healed!");
-                
+                player.print(messages.get("commands.heal.self"));
+
                 // Keep track of this
                 included = true;
             } else if (!args.hasFlag('s')) {
-                player.print("Healed by " + sender.getDisplayName() + ".");
-                
+                player.print(messages.format("commands.heal.by-other", "actor", sender.getDisplayName()));
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included) {
-            sender.print("Players healed.");
+            sender.print(messages.get("commands.heal.others"));
         }
     }
     
     @Command(aliases = {"slay"}, usage = "[player]", desc = "Slay a player", flags = "s", max = 1)
     public void slay(CommandContext args, Actor sender) throws CommandException, AuthorizationException {
-        
+
+        MessageBundle messages = worldGuard.getMessages();
         Iterable<? extends LocalPlayer> targets = Lists.newArrayList();
         boolean included = false;
         
@@ -195,37 +200,38 @@ public class GeneralCommands {
             
             // Tell the user
             if (player.equals(sender)) {
-                player.print("Slain!");
-                
+                player.print(messages.get("commands.slay.self"));
+
                 // Keep track of this
                 included = true;
             } else if (!args.hasFlag('s')) {
-                player.print("Slain by " + sender.getDisplayName() + ".");
-                
+                player.print(messages.format("commands.slay.by-other", "actor", sender.getDisplayName()));
+
             }
         }
-        
+
         // The player didn't receive any items, then we need to send the
         // user a message so s/he know that something is indeed working
         if (!included) {
-            sender.print("Players slain.");
+            sender.print(messages.get("commands.slay.others"));
         }
     }
     
     @Command(aliases = {"locate"}, usage = "[player]", desc = "Locate a player", max = 1)
     @CommandPermissions({"worldguard.locate"})
     public void locate(CommandContext args, Actor sender) throws CommandException {
+        MessageBundle messages = worldGuard.getMessages();
         LocalPlayer player = worldGuard.checkPlayer(sender);
-        
+
         if (args.argsLength() == 0) {
             player.setCompassTarget(new Location(player.getWorld(), player.getWorld().getSpawnPosition().toVector3()));
-            
-            sender.print("Compass reset to spawn.");
+
+            sender.print(messages.get("commands.locate.compass-reset"));
         } else {
             LocalPlayer target = worldGuard.getPlatform().getMatcher().matchSinglePlayer(sender, args.getString(0));
             player.setCompassTarget(target.getLocation());
-            
-            sender.print("Compass repointed.");
+
+            sender.print(messages.get("commands.locate.compass-repointed"));
         }
     }
     
@@ -233,10 +239,11 @@ public class GeneralCommands {
     @Command(aliases = {"stack", ";"}, usage = "", desc = "Stack items", max = 0)
     @CommandPermissions({"worldguard.stack"})
     public void stack(CommandContext args, Actor sender) throws CommandException {
+        MessageBundle messages = worldGuard.getMessages();
         LocalPlayer player = worldGuard.checkPlayer(sender);
 
         WorldGuard.getInstance().getPlatform().stackPlayerInventory(player);
 
-        player.print("Items compacted into stacks!");
+        player.print(messages.get("commands.stack.done"));
     }
 }
