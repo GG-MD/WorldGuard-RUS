@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.WorldGuard;
+
 import javax.annotation.Nullable;
 import java.util.Collection;
 
@@ -88,7 +90,7 @@ public class StateFlag extends Flag<StateFlag.State> {
         } else if (input.equalsIgnoreCase("none")) {
             return null;
         } else {
-            throw new InvalidFlagFormat("Expected none/allow/deny but got '" + input + "'");
+            throw new InvalidFlagFormat(WorldGuard.getInstance().getMessages().format("flag-input.expected-state", "input", input));
         }
     }
 

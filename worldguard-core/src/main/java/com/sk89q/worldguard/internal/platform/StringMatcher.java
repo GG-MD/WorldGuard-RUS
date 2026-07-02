@@ -25,6 +25,7 @@ import com.sk89q.worldedit.entity.Player;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.world.World;
 import com.sk89q.worldguard.LocalPlayer;
+import com.sk89q.worldguard.WorldGuard;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -73,7 +74,7 @@ public interface StringMatcher {
     default Iterable<? extends LocalPlayer> checkPlayerMatch(List<? extends LocalPlayer> players) throws CommandException {
         // Check to see if there were any matches
         if (players.isEmpty()) {
-            throw new CommandException("No players matched query.");
+            throw new CommandException(WorldGuard.getInstance().getMessages().get("matcher.no-players"));
         }
 
         return players;
@@ -115,8 +116,7 @@ public interface StringMatcher {
         // players were found (we don't want to just pick off the first one,
         // as that may be the wrong player)
         if (players.hasNext()) {
-            throw new CommandException("More than one player found! " +
-                    "Use @<name> for exact matching.");
+            throw new CommandException(WorldGuard.getInstance().getMessages().get("matcher.multiple-players"));
         }
 
         return match;

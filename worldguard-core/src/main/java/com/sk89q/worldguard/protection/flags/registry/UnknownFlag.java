@@ -22,6 +22,7 @@ package com.sk89q.worldguard.protection.flags.registry;
 import com.sk89q.worldguard.protection.flags.Flag;
 import com.sk89q.worldguard.protection.flags.FlagContext;
 import com.sk89q.worldguard.protection.flags.InvalidFlagFormat;
+import com.sk89q.worldguard.WorldGuard;
 
 import javax.annotation.Nullable;
 
@@ -33,7 +34,7 @@ public class UnknownFlag extends Flag<Object> {
 
     @Override
     public Object parseInput(FlagContext context) throws InvalidFlagFormat {
-        throw new InvalidFlagFormat("The plugin that registered this flag is not currently installed");
+        throw new InvalidFlagFormat(WorldGuard.getInstance().getMessages().get("flag-input.unknown-flag-plugin"));
     }
 
     @Override

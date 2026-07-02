@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.WorldGuard;
+
 import com.sk89q.worldedit.registry.Keyed;
 import com.sk89q.worldedit.registry.Registry;
 
@@ -47,7 +49,7 @@ public class RegistryFlag<T extends Keyed> extends Flag<T> {
     public T parseInput(FlagContext context) throws InvalidFlagFormat {
         final String key = context.getUserInput().trim().toLowerCase(Locale.ROOT);
         return Optional.ofNullable(registry.get(key))
-                .orElseThrow(() -> new InvalidFlagFormat("Unknown " + registry.getName() + ": " + key));
+                .orElseThrow(() -> new InvalidFlagFormat(WorldGuard.getInstance().getMessages().format("flag-input.unknown-registry-value", "registry", registry.getName(), "key", key)));
     }
 
     public Registry<T> getRegistry() {

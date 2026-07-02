@@ -76,7 +76,7 @@ public class LocationFlag extends Flag<Location> {
                             player.printDebug("WARNING: Flag location is outside of region.");
                         } else {
                             // no permission
-                            throw new InvalidFlagFormat("You can't set that flag outside of the region boundaries.");
+                            throw new InvalidFlagFormat(WorldGuard.getInstance().getMessages().get("flag-input.location-outside-region"));
                         }
                     }
                     // clamp height to world limits
@@ -86,7 +86,7 @@ public class LocationFlag extends Flag<Location> {
             }
             return loc;
         }
-        throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
+        throw new InvalidFlagFormat(WorldGuard.getInstance().getMessages().get("flag-input.expected-here-or-xyz"));
     }
 
     @Override

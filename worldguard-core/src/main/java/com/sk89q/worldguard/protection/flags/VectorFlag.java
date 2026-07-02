@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.WorldGuard;
+
 import com.sk89q.worldedit.math.Vector3;
 
 import java.util.HashMap;
@@ -56,7 +58,7 @@ public class VectorFlag extends Flag<Vector3> {
                 }
             }
 
-            throw new InvalidFlagFormat("Expected 'here' or x,y,z.");
+            throw new InvalidFlagFormat(WorldGuard.getInstance().getMessages().get("flag-input.expected-here-or-xyz"));
         }
     }
 

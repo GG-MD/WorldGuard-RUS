@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.WorldGuard;
+
 /**
  * Stores an enum value.
  */
@@ -79,8 +81,7 @@ public class EnumFlag<T extends Enum<T>> extends Flag<T> {
         try {
             return findValue(input);
         } catch (IllegalArgumentException e) {
-            throw new InvalidFlagFormat("Unknown value '" + input + "' in "
-                    + enumClass.getName());
+            throw new InvalidFlagFormat(WorldGuard.getInstance().getMessages().format("flag-input.unknown-enum-value", "input", input, "enum", enumClass.getName()));
         }
     }
 

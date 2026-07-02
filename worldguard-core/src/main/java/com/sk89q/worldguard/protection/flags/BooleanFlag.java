@@ -19,6 +19,8 @@
 
 package com.sk89q.worldguard.protection.flags;
 
+import com.sk89q.worldguard.WorldGuard;
+
 /**
  * A boolean flag.
  */
@@ -45,7 +47,7 @@ public class BooleanFlag extends Flag<Boolean> {
                 || input.equalsIgnoreCase("0")) {
             return false;
         } else {
-            throw new InvalidFlagFormat("Not a yes/no value: " + input);
+            throw new InvalidFlagFormat(WorldGuard.getInstance().getMessages().format("flag-input.not-yes-no", "input", input));
         }
     }
 
