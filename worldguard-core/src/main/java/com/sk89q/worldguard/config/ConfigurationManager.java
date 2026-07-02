@@ -80,6 +80,13 @@ public abstract class ConfigurationManager {
     public boolean disableDefaultBypass;
     public boolean announceBypassStatus;
 
+    /**
+     * The language file to load customizable messages from
+     * ({@code lang/<locale>.yml}). English ({@code en-US}) is always the
+     * built-in fallback for any message missing from the chosen locale.
+     */
+    public String locale = "ru-RU";
+
     @Unreported public Map<String, String> hostKeys = new HashMap<>();
     public boolean hostKeysAllowFMLClients;
 

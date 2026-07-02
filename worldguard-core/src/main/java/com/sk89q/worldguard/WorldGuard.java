@@ -36,6 +36,7 @@ import com.sk89q.worldguard.internal.platform.WorldGuardPlatform;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.flags.registry.FlagRegistry;
 import com.sk89q.worldguard.protection.flags.registry.SimpleFlagRegistry;
+import com.sk89q.worldguard.util.MessageBundle;
 import com.sk89q.worldguard.util.WorldGuardExceptionConverter;
 import com.sk89q.worldguard.util.concurrent.EvenMoreExecutors;
 
@@ -60,6 +61,7 @@ public final class WorldGuard {
     private ProfileService profileService;
     private ListeningExecutorService executorService;
     private WorldGuardExceptionConverter exceptionConverter = new WorldGuardExceptionConverter();
+    private volatile MessageBundle messages = MessageBundle.bundledOnly();
 
     static {
         Flags.registerAll();
@@ -89,6 +91,27 @@ public final class WorldGuard {
         profileService = getPlatform().createProfileService(profileCache);
 
         getPlatform().load();
+
+        reloadMessages();
+    }
+
+    /**
+     * Get the bundle of customizable, user-facing messages.
+     *
+     * @return the message bundle
+     */
+    public MessageBundle getMessages() {
+        return messages;
+    }
+
+    /**
+     * Reload the customizable messages from the language file selected in the
+     * configuration.
+     */
+    public void reloadMessages() {
+        File dataFolder = getPlatform().getConfigDir().toFile();
+        String locale = getPlatform().getGlobalStateManager().locale;
+        messages = MessageBundle.load(dataFolder, locale);
     }
 
     /**
@@ -173,7 +196,7 @@ public final class WorldGuard {
         if (sender instanceof LocalPlayer) {
             return (LocalPlayer) sender;
         } else {
-            throw new CommandException("A player is expected.");
+            throw new CommandException(getMessages().get("common.player-expected"));
         }
     }
 

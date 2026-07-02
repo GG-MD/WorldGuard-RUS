@@ -53,6 +53,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         }
 
         config.removeProperty("suppress-tick-sync-warnings");
+        locale = config.getString("locale", "ru-RU");
         migrateRegionsToUuid = config.getBoolean("regions.uuid-migration.perform-on-next-start", true);
         keepUnresolvedNames = config.getBoolean("regions.uuid-migration.keep-names-that-lack-uuids", true);
         useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
