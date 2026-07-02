@@ -345,6 +345,8 @@ commands:
       no-teleport: 'The region has no teleport point associated.'
       # {id} = region id
       unable: 'Unable to teleport to region ''{id}''.'
+      # Default value of the teleport-message flag. %id% = region id.
+      default-message: '&dTeleported you to the region ''%id%''.'
     bypass:
       usage: 'Allowed optional arguments are: on, off'
       enabled: 'You are now bypassing region protection (as long as you have permission).'
@@ -354,6 +356,10 @@ commands:
 protection:
   # Substituted into the region deny message in place of {what}/%what%.
   deny:
+    # Default values of the deny-message flags. %what% is replaced by one of the fragments below.
+    default-message: '&c&lHey!&r&7 Sorry, but you can''t %what% here.'
+    default-entry-message: '&c&lHey!&r&7 You are not permitted to enter this area.'
+    default-exit-message: '&c&lHey!&r&7 You are not permitted to leave this area.'
     pvp: 'PvP'
     break-that-block: 'break that block'
     break-things: 'break things'

@@ -19,11 +19,6 @@
 
 package com.sk89q.worldguard.protection.flags;
 
-import com.google.common.collect.Sets;
-import com.sk89q.worldedit.util.formatting.text.TextComponent;
-import com.sk89q.worldedit.util.formatting.text.format.TextColor;
-import com.sk89q.worldedit.util.formatting.text.format.TextDecoration;
-import com.sk89q.worldedit.util.formatting.text.serializer.legacy.LegacyComponentSerializer;
 import com.sk89q.worldedit.world.entity.EntityType;
 import com.sk89q.worldedit.world.gamemode.GameMode;
 import com.sk89q.worldedit.world.weather.WeatherType;
@@ -150,9 +145,7 @@ public final class Flags {
      *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
      */
     @Deprecated
-    public static final StringFlag TELE_MESSAGE = register(new StringFlag("teleport-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of(
-                    "Teleported you to the region '%id%'.", TextColor.LIGHT_PURPLE)))));
+    public static final StringFlag TELE_MESSAGE = register(localizedMessage("teleport-message", "commands.region.tp.default-message"));
 
     // idk?
     public static final StateFlag INVINCIBILITY = register(new StateFlag("invincible", false));
@@ -220,28 +213,19 @@ public final class Flags {
      *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
      */
     @Deprecated
-    public static final StringFlag DENY_MESSAGE = register(new StringFlag("deny-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
-                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                    .append(TextComponent.of(" Sorry, but you can't %what% here.", TextColor.GRAY)))));
+    public static final StringFlag DENY_MESSAGE = register(localizedMessage("deny-message", "protection.deny.default-message"));
     /**
      * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
      *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
      */
     @Deprecated
-    public static final StringFlag ENTRY_DENY_MESSAGE = register(new StringFlag("entry-deny-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
-                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                    .append(TextComponent.of(" You are not permitted to enter this area.", TextColor.GRAY)))));
+    public static final StringFlag ENTRY_DENY_MESSAGE = register(localizedMessage("entry-deny-message", "protection.deny.default-entry-message"));
     /**
      * @deprecated The type of this flag will change from a StringFlag to a ComponentFlag to support JSON text
      *              in a future release. If you depend on the type of this flag, take proper precaution for future breakage.
      */
     @Deprecated
-    public static final StringFlag EXIT_DENY_MESSAGE = register(new StringFlag("exit-deny-message",
-            LegacyComponentSerializer.INSTANCE.serialize(TextComponent.of("").append(TextComponent.of("Hey!",
-                    TextColor.RED, Sets.newHashSet(TextDecoration.BOLD)))
-                    .append(TextComponent.of(" You are not permitted to leave this area.", TextColor.GRAY)))));
+    public static final StringFlag EXIT_DENY_MESSAGE = register(localizedMessage("exit-deny-message", "protection.deny.default-exit-message"));
 
     private Flags() {
     }
@@ -256,6 +240,24 @@ public final class Flags {
         T f = register(flag);
         cfg.accept(f);
         return f;
+    }
+
+    /**
+     * Create a string flag whose default value is resolved from the localized
+     * message bundle at query time, so it follows the configured language and
+     * responds to {@code /wg reload}.
+     *
+     * @param name the flag name
+     * @param messageKey the message bundle key providing the default value
+     * @return the flag
+     */
+    private static StringFlag localizedMessage(String name, String messageKey) {
+        return new StringFlag(name) {
+            @Override
+            public String getDefault() {
+                return WorldGuard.getInstance().getMessages().get(messageKey);
+            }
+        };
     }
 
     /**
