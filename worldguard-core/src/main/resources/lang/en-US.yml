@@ -1,0 +1,468 @@
+#
+# WorldGuard messages / language file
+#
+# This file lets you customize every message that WorldGuard shows to players
+# and administrators. Edit the text on the right side of the colon.
+#
+# How it works:
+# - The active language is chosen by the "locale" option in config.yml.
+#   WorldGuard loads lang/<locale>.yml from this folder (default: en-US).
+# - You may safely delete any line: WorldGuard falls back to the built-in
+#   default for any key that is missing, so the plugin never breaks.
+# - Placeholders are written as {name} and are replaced at runtime. Only use
+#   the placeholders that are documented for each message.
+# - Do NOT use tabs, only spaces (this is a YAML file).
+# - Colours: you may use legacy codes such as &c, &a, &e, &l (bold), &n,
+#   etc. anywhere in a message and the text will be coloured/styled. Leaving
+#   a message without codes keeps WorldGuard's original default appearance.
+#
+
+commands:
+  fire:
+    # {world} = world name, {actor} = name of the sender
+    already-disabled: 'Fire spread was already globally disabled.'
+    disabled-broadcast: 'Fire spread has been globally disabled for ''{world}'' by {actor}.'
+    already-enabled: 'Fire spread was already globally enabled.'
+    enabled-broadcast: 'Fire spread has been globally for ''{world}'' re-enabled by {actor}.'
+  halt-activity:
+    intensive-not-allowed: 'ALL intensive server activity is not allowed.'
+    intensive-allowed: 'ALL intensive server activity is allowed.'
+    # Confirmation prompt shown before erasing entities. Text fragments only;
+    # the clickable button and colors are added by WorldGuard.
+    confirm-prefix: 'This command will '
+    confirm-permanently: 'PERMANENTLY'
+    confirm-suffix: ' erase ALL animals in ALL loaded chunks in ALL loaded worlds. '
+    confirm-click: '[Click]'
+    # {command} = the command being confirmed
+    confirm-click-hover: 'Click to confirm /{command}'
+    confirm-or-type: ' or type '
+    confirm-to-confirm: ' to confirm.'
+    # {actor} = name of the sender
+    halted: 'ALL intensive server activity halted.'
+    halted-broadcast: 'ALL intensive server activity halted by {actor}.'
+    halted-silent: '(Silent) ALL intensive server activity halted by {actor}.'
+    # {count} = number of entities removed, {world} = world name
+    entities-removed: '{count} entities (>10) auto-removed from {world}'
+    now-allowed: 'ALL intensive server activity is now allowed.'
+    now-allowed-silent: '(Silent) ALL intensive server activity is now allowed.'
+  wg:
+    version:
+      # {version} = WorldGuard version
+      header: 'WorldGuard {version}'
+      website: 'http://www.enginehub.org'
+    reload:
+      pending-tasks: 'There are currently pending tasks. Use /wg running to monitor these tasks first.'
+      success: 'WorldGuard configuration reloaded.'
+      # {error} = error message
+      error: 'Error while reloading: {error}'
+    report:
+      # {path} = absolute file path
+      written: 'WorldGuard report written to {path}'
+      # {error} = error message
+      failed: 'Failed to write report: {error}'
+    profile:
+      too-short: 'You must run the profile for at least 1 minute.'
+      too-long: 'You can profile for, at maximum, 10 minutes.'
+      interval-range: 'Interval must be between 1 and 100 (in milliseconds)'
+      already-running: 'A profile is currently in progress! Please use /wg stopprofile to cancel the current profile.'
+      # {minutes} = number of minutes
+      starting: 'Starting CPU profiling. Results will be available in {minutes} minutes.'
+      use-prefix: 'Use '
+      stop-command: '/wg stopprofile'
+      use-suffix: ' at any time to cancel CPU profiling.'
+      # {minutes} = number of minutes
+      task-name: 'CPU profiling for {minutes} minutes'
+      # {path} = absolute file path
+      written: 'CPU profiling data written to {path}'
+      # {error} = error message
+      write-failed: 'Failed to write CPU profiling data: {error}'
+    stopprofile:
+      none-running: 'No CPU profile is currently running.'
+      cancelled: 'The running CPU profile has been cancelled.'
+    flushstates:
+      cleared-all: 'Cleared all states.'
+      # {player} = player name
+      cleared-player: 'Cleared states for player "{player}".'
+    running:
+      none: 'There are currently no running tasks.'
+      title: 'Running Tasks'
+      note: 'Note: Some ''running'' tasks may be waiting to be start.'
+  # {actor} = name of the player who ran the command
+  god:
+    self: 'God mode enabled! Use /ungod to disable.'
+    by-other: 'God enabled by {actor}.'
+    others: 'Players now have god mode.'
+  ungod:
+    self: 'God mode disabled!'
+    by-other: 'God disabled by {actor}.'
+    others: 'Players no longer have god mode.'
+  heal:
+    self: 'Healed!'
+    by-other: 'Healed by {actor}.'
+    others: 'Players healed.'
+  slay:
+    self: 'Slain!'
+    by-other: 'Slain by {actor}.'
+    others: 'Players slain.'
+  locate:
+    compass-reset: 'Compass reset to spawn.'
+    compass-repointed: 'Compass repointed.'
+  stack:
+    done: 'Items compacted into stacks!'
+  region:
+    members:
+      max-regions-owned: 'You already own the maximum allowed amount of regions.'
+      list-names-to-remove: 'List some names to remove, or use -a to remove all.'
+      querying-names: '(Please wait... querying player names...)'
+      # {id} = region id, {world} = world name
+      task-adding-members: 'Adding members to the region ''{id}'' on ''{world}'''
+      task-adding-owners: 'Adding owners to the region ''{id}'' on ''{world}'''
+      task-removing-members: 'Removing members from the region ''{id}'' on ''{world}'''
+      task-removing-owners: 'Removing owners from the region ''{id}'' on ''{world}'''
+      # {id} = region id
+      added-members: 'Region ''{id}'' updated with new members.'
+      added-owners: 'Region ''{id}'' updated with new owners.'
+      removed-members: 'Region ''{id}'' updated with members removed.'
+      removed-owners: 'Region ''{id}'' updated with owners removed.'
+      fail-add-members: 'Failed to add new members'
+      fail-add-owners: 'Failed to add new owners'
+      fail-remove-members: 'Failed to remove members'
+      fail-remove-owners: 'Failed to remove owners'
+    base:
+      # {flag} = the world flag letter (e.g. w)
+      specify-world: 'Please specify the world with -{flag} world_name.'
+      # {id} = region id
+      invalid-name: 'The region name of ''{id}'' contains characters that are not allowed.'
+      global-not-allowed: 'Sorry, you can''t use __global__ here.'
+      # {id} = region id
+      not-found: 'No region could be found with the name of ''{id}''.'
+      not-standing-in-region: 'You''re not standing in a region. Specify an ID if you want to select a specific region.'
+      current-regions: 'Current regions: '
+      click-to-pick: 'Click to pick this region'
+      several-regions: 'You''re standing in several regions (please pick one).'
+      select-area-first: 'Please select an area first. Use WorldEdit to make a selection! (see: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).'
+      already-exists: 'A region with that name already exists. Please choose another name.'
+      # {id} = region id
+      already-exists-redefine: ' To change the shape, use /region redefine {id}.'
+      regions-disabled: 'Region support is disabled in the target world. It can be enabled per-world in WorldGuard''s configuration files. However, you may need to restart your server afterwards.'
+      data-failed: 'Region data failed to load for this world. Please ask a server administrator to read the logs to identify the reason.'
+      only-cuboid-poly: 'Sorry, you can only use cuboids and polygons for WorldGuard regions.'
+      # {worlds} = comma-separated list of world names
+      save-failing: '(Warning: The background saving of region data is failing for these worlds: {worlds}. Your changes are getting lost. See the server log for more information.)'
+      new-user-prefix: '(This region is NOW PROTECTED from modification from others. Don''t want that? Use '
+      # {id} = region id
+      new-user-command: '/rg flag {id} passthrough allow'
+      new-user-suffix: ')'
+      spawn-overlap-warning: 'Warning!'
+      spawn-overlap-detail: ' This region overlaps vanilla''s spawn protection. WorldGuard cannot override this, and only server operators will be able to interact with this area.'
+      # {type} = region type name
+      selected: 'Region selected as {type}'
+      # {type} = region type name
+      cannot-select: 'Can''t select that region! The region type ''{type}'' can''t be selected.'
+    # /rg info printout labels, buttons and click hints
+    info:
+      title: 'Region Info'
+      region-label: 'Region: '
+      type-prefix: ' (type='
+      priority-prefix: ', priority='
+      flags-label: 'Flags: '
+      none: '(none)'
+      click-set-flag: 'Click to set flag'
+      flags-button: '[Flags]'
+      click-set-a-flag: 'Click to set a flag'
+      parent-prefix: ' (parent, priority='
+      click-for-info: 'Click for info'
+      unlink-button: '[X]'
+      click-unlink-parent: 'Click to unlink parent'
+      owners-label: 'Owners: '
+      members-label: 'Members: '
+      add-button: '[Add]'
+      click-add: 'Click to add a player or group'
+      rem-button: '[Rem]'
+      click-remove: 'Click to remove a player or group'
+      clr-button: '[Clr]'
+      click-clear: 'Click to clear'
+      bounds-label: 'Bounds:'
+      click-select: 'Click to select'
+      teleport-button: '[Teleport]'
+      click-teleport: 'Click to teleport'
+      center-teleport-button: '[Center Teleport]'
+      click-center-teleport: 'Click to teleport to the center of the region'
+      click-change: 'Click to change'
+      last-seen-note: 'Any names suffixed by * are ''last seen names'' and may not be up to date.'
+      # /rg info command feedback
+      specify-region: 'Please specify the region with /region info -w world_name region_name.'
+      task: 'Fetching region info'
+      fetching: '(Please wait... fetching region information...)'
+      fetch-failed: 'Failed to fetch region information'
+    # /rg flags interactive flag editor
+    flags:
+      # {id} = region id
+      title: 'Flags for {id}'
+      third-party: 'Third-Party Flags'
+      membership-default-hover: 'This is a special flag which defaults to allow for members, and deny for non-members'
+      passthrough-hover: 'This is a special flag which overrides build checks. (Not movement related!)'
+      click-unset: 'Click to unset'
+      danger-line1: 'Setting this flag may have unintended consequences.'
+      danger-line2: 'Please read the documentation and set this flag manually if you really intend to.'
+      danger-line3: '(Hint: You do not need to set this to protect the region!)'
+      click-set: 'Click to set'
+      click-set-custom: 'Click to set custom value'
+      click-change: 'Click to change'
+      # Value-type hints, composed from these fragments
+      inherited-default-prefix: 'Inherited & '
+      default-lower: 'default'
+      value-suffix: ' value'
+      inherited-value: 'Inherited value'
+      default-upper: 'Default'
+      current-values: 'Current values:'
+      current-value: 'Current value:'
+      default-value: 'Default value:'
+      unset-location: 'unset location'
+      unset-number: 'unset number'
+      custom: '[custom]'
+      unset-string: 'unset string'
+    # {description} = the localized task description
+    please-wait: '(Please wait... {description})'
+    please-wait-plain: 'Please wait... {description}'
+    # {world} = world name
+    no-manager: 'No region manager exists for world ''{world}''.'
+    define:
+      # {id} = region id
+      task-adding: 'Adding region ''{id}'''
+      made: 'A new region has been made named ''{id}''.'
+      fail-add: 'Failed to add the region ''{id}'''
+    redefine:
+      # {id} = region id
+      task-updating: 'Updating region ''{id}'''
+      updated: 'Region ''{id}'' has been updated with a new area.'
+      fail-update: 'Failed to update the region ''{id}'''
+    claim:
+      overlap: 'This region overlaps with someone else''s region.'
+      only-inside: 'You may only claim regions inside existing regions that you or your group own.'
+      # {max} = maximum supported volume
+      max-volume-too-high: 'The maximum claim volume get in the configuration is higher than is supported. Currently, it must be {max} or smaller. Please contact a server administrator.'
+      no-polygons: 'Polygons are currently not supported for /rg claim.'
+      too-large: 'This region is too large to claim.'
+      # {max} = configured max volume, {volume} = the player's region volume
+      volume-info: 'Max. volume: {max}, your volume: {volume}'
+      # {id} = region id
+      claimed: 'A new region has been claimed named ''{id}''.'
+    select:
+      specify-name: 'Please specify a region name.'
+    list:
+      task: 'Getting region list'
+      fetching: '(Please wait... fetching region list...)'
+      fetch-failed: 'Failed to fetch region list'
+      # {name} = player name
+      lookup-failed: 'Failed to lookup the UUID of ''{name}'''
+      lookup-interrupted: 'The lookup the UUID of ''{name}'' was interrupted'
+      user-not-exist: 'A user by the name of ''{name}'' does not seem to exist.'
+    flag:
+      empty-with-value: 'You cannot use -e(mpty) with a flag value.'
+      # Warnings shown when setting the build/passthrough flags. Fragments only.
+      warn-label: 'WARNING:'
+      passthrough-unrelated: ' This flag is unrelated to moving through regions.'
+      passthrough-overrides: 'It overrides build checks. If you''re unsure what this means, see '
+      build-not-required: ' Setting this flag is not required for protection.'
+      build-override: 'Setting this flag will completely override default protection, and apply to members, non-members, pistons, sand physics, and everything else that can modify blocks.'
+      build-only-if-sure: 'Only set this flag if you are sure you know what you are doing. See '
+      doc-link: '[this documentation page]'
+      for-more-info: ' for more info.'
+      doc-url-protection: 'https://worldguard.enginehub.org/en/latest/regions/flags/#protection-related'
+      doc-url-overrides: 'https://worldguard.enginehub.org/en/latest/regions/flags/#overrides'
+      # {flag} = flag name
+      no-group-flag: 'Region flag ''{flag}'' does not have a group flag!'
+      # {flag} = flag name, {id} = region id, {value} = value
+      set: 'Region flag {flag} set on ''{id}'' to ''{value}''.'
+      # {flag} = flag name, {id} = region id
+      removed: 'Region flag {flag} removed from ''{id}''. (Any -g(roups) were also removed.)'
+      # {flag} = flag name
+      group-reset: 'Region group flag for ''{flag}'' reset to default.'
+      group-set: 'Region group flag for ''{flag}'' set.'
+      current-flags-prefix: '(Current flags: '
+      list-task: 'Flag list for invalid flag command.'
+      available-flags: 'Available flags: '
+      # {flag} = the unknown flag name
+      unknown: 'Unknown flag specified: {flag}'
+      or-use-command: 'Or use the command '
+      # {id} = region id
+      flags-command: '/rg flags {id}'
+    flags-view:
+      specify-region: 'Please specify the region with /region flags -w world_name region_name.'
+      fetch-failed: 'Failed to get region flags'
+    setpriority:
+      # {id} = region id, {priority} = new priority
+      set: 'Priority of ''{id}'' set to {priority} (higher numbers override).'
+    setparent:
+      # {parent} = parent region id, {child} = child region id
+      circular: 'Uh oh! Setting ''{parent}'' to be the parent of ''{child}'' would cause circular inheritance.'
+      # {parent} = parent region id
+      current-on: '(Current inheritance on ''{parent}'':'
+      # {child} = child region id
+      set: 'Inheritance set for region ''{child}''.'
+      current: '(Current inheritance:'
+      orphaned: ' Region is now orphaned.'
+    remove:
+      conflicting-flags: 'You cannot use both -u (unset parent) and -f (remove children) together.'
+      # {id} = region id, {world} = world name
+      task: 'Removing region ''{id}'' in ''{world}'''
+      wait: 'Please wait... removing region.'
+      # {regions} = comma-separated list of removed region ids
+      success: 'Successfully removed {regions}.'
+      failed: 'Failed to remove region'
+    store:
+      # {world} = world name
+      load-task: 'Loading region data for ''{world}''.'
+      load-success: 'Loaded region data for ''{world}'''
+      load-failed: 'Failed to load region data for ''{world}'''
+      load-task-all: 'Loading regions for all worlds'
+      load-wait-all: '(Please wait... loading region data for all worlds...)'
+      load-success-all: 'Successfully load the region data for all worlds.'
+      load-failed-all: 'Failed to load regions for all worlds'
+      # {world} = world name
+      save-task: 'Saving region data for ''{world}''.'
+      save-success: 'Saving region data for ''{world}'''
+      save-failed: 'Failed to save region data for ''{world}'''
+      save-task-all: 'Saving regions for all worlds'
+      save-wait-all: '(Please wait... saving region data for all worlds...)'
+      save-success-all: 'Successfully saved the region data for all worlds.'
+      save-failed-all: 'Failed to save regions for all worlds'
+      migrate-bad-from: 'The value of ''from'' is not a recognized type of region data database.'
+      migrate-bad-to: 'The value of ''to'' is not a recognized type of region region data database.'
+      migrate-same-type: 'It is not possible to migrate between the same types of region data databases.'
+      migrate-dangerous: "This command is potentially dangerous.\nPlease ensure you have made a backup of your data, and then re-enter the command with -y tacked on at the end to proceed."
+      migrate-from-unsupported: 'The driver specified as ''from'' does not seem to be supported in your version of WorldGuard.'
+      migrate-to-unsupported: 'The driver specified as ''to'' does not seem to be supported in your version of WorldGuard.'
+      migrate-performing: 'Now performing migration... this may take a while.'
+      migrate-complete-driver: 'Migration complete! This only migrated the data. If you already changed your settings to use the target driver, then WorldGuard is now using the new data. If not, you have to adjust your configuration to use the new driver and then restart your server.'
+      migrate-complete: 'Migration complete!'
+      # {error} = error message
+      migrate-error: 'Error encountered while migrating: {error}'
+    tp:
+      no-center: 'The region has no center point.'
+      center-spectator-only: 'Center teleport is only available in Spectator gamemode.'
+      no-teleport: 'The region has no teleport point associated.'
+      # {id} = region id
+      unable: 'Unable to teleport to region ''{id}''.'
+    bypass:
+      usage: 'Allowed optional arguments are: on, off'
+      enabled: 'You are now bypassing region protection (as long as you have permission).'
+      disabled: 'You are no longer bypassing region protection.'
+
+# Region protection messages shown to players when an action is denied.
+protection:
+  # Substituted into the region deny message in place of {what}/%what%.
+  deny:
+    pvp: 'PvP'
+    break-that-block: 'break that block'
+    break-things: 'break things'
+    break-vehicles: 'break vehicles'
+    change-that: 'change that'
+    damage-that: 'damage that'
+    drop-xp: 'drop XP'
+    drop-items: 'drop items'
+    harm-that: 'harm that'
+    hit-that: 'hit that'
+    open-that: 'open that'
+    pick-up-items: 'pick up items'
+    place-fire: 'place fire'
+    place-that-block: 'place that block'
+    place-things: 'place things'
+    place-vehicles: 'place vehicles'
+    ride-that: 'ride that'
+    sleep: 'sleep'
+    take-that: 'take that'
+    use-anchors: 'use anchors'
+    use-dynamite: 'use dynamite'
+    use-explosives: 'use explosives'
+    use-frostwalker: 'use frostwalker'
+    use-lingering-potions: 'use lingering potions'
+    use-that: 'use that'
+    chat: 'chat'
+    # Prefix for the denied-command message; the command follows
+    use-command: 'use '
+  disembark:
+    warning: 'Don''t disembark here!'
+    detail: ' You can''t get back on.'
+  # Sign-based chest protection messages
+  chest:
+    spot-no-permission: 'This spot is for a chest that you don''t have permission for.'
+    protected: 'This chest is protected.'
+    not-owner-adjacent: 'You do not own the adjacent chest.'
+    sign-must-be-post: 'The [Lock] sign must be a sign post, not a wall sign.'
+    first-line-name: 'The first owner line must be your name.'
+    unsafe-block: 'That is not a safe block that you''re putting this sign on.'
+    now-protected: 'A chest or double chest above is now protected.'
+    disabled: 'WorldGuard''s sign chest protection is disabled.'
+  # Blocked potion/arrow effect messages. {effect} = effect name
+  potions:
+    arrows-disabled: 'Sorry, arrows with {effect} are presently disabled.'
+    cant-throw: 'Sorry, potions with {effect} can''t be thrown, even if you have a permission to bypass it, due to limitations (and because overly-reliable potion blocking is on).'
+    disabled: 'Sorry, potions with {effect} are presently disabled.'
+
+# Messages from the player listener (join notices, region wand, misc)
+player:
+  intensive-halted: 'Intensive server activity has been HALTED.'
+  fire-disabled: 'Fire spread is currently globally disabled for this world.'
+  invalid-host-key: 'You did not join with the valid host key!'
+  infinite-stack-removed: 'Infinite stack removed.'
+  # {slot} = inventory slot number
+  infinite-stack-slot: 'Infinite stack in slot #{slot} removed.'
+  op-console-only: '/op and /deop can only be used in console (as set by a WG setting).'
+  # Region wand tool output. {answer} = build-yes/build-no, {regions} = region list
+  can-build: 'Can you build? {answer}'
+  build-yes: 'Yes'
+  build-no: 'No'
+  applicable-regions: 'Applicable regions: {regions}'
+  no-regions-here: 'WorldGuard: No defined regions here!'
+
+# Shared messages
+common:
+  player-expected: 'A player is expected.'
+# Player/world/group matcher errors
+matcher:
+  no-players: 'No players matched query.'
+  multiple-players: 'More than one player found! Use @<name> for exact matching.'
+  no-normal-world: 'No normal world found.'
+  no-nether-world: 'No nether world found.'
+  no-end-world: 'No end world found.'
+  argument-expected-player: 'Argument expected for #player.'
+  # {filter} = the identifier entered
+  invalid-identifier: 'Invalid identifier ''{filter}''.'
+  no-exact-world: 'No world by that exact name found.'
+  # {filter} = the group entered
+  invalid-group: 'Invalid group ''{filter}''.'
+# Plugin-level messages
+plugin:
+  no-permission: 'You don''t have permission.'
+  worldedit-not-installed: 'WorldEdit does not appear to be installed.'
+  worldedit-not-enabled: 'WorldEdit does not appear to be enabled.'
+  worldedit-detection-failed: 'WorldEdit detection failed (report error).'
+
+# Errors shown to a player when they enter an invalid flag value
+flag-input:
+  # {input} = the value the player entered
+  unknown-entity-type: 'Unknown entity type: {input}'
+  unknown-weather-type: 'Unknown weather type: {input}'
+  location-outside-region: 'You can''t set that flag outside of the region boundaries.'
+  expected-here-or-xyz: 'Expected ''here'' or x,y,z.'
+  not-valid-uuid: 'Not a valid uuid: {input}'
+  expected-state: 'Expected none/allow/deny but got ''{input}'''
+  unrecognized-input: 'Unrecognized input.'
+  expected-now-or-iso: 'Expected ''now'' or ISO 8601 formatted input.'
+  map-format: 'Input must be in a ''key:value,key1=value1'' format. Either '':'' or ''='' can be used.'
+  unknown-game-mode: 'Unknown game mode: {input}'
+  # {input} = value entered, {enum} = internal type name
+  unknown-enum-value: 'Unknown value ''{input}'' in {enum}'
+  not-a-player: 'Not a player'
+  not-a-number: 'Not a number: {input}'
+  not-yes-no: 'Not a yes/no value: {input}'
+  unknown-flag-plugin: 'The plugin that registered this flag is not currently installed'
+  # {registry} = registry name, {key} = value entered
+  unknown-registry-value: 'Unknown {registry}: {key}'
+
+# Blacklist default notification (when no custom message is configured)
+blacklist:
+  # {action} = the blocked action description; the item/block name follows
+  not-allowed: 'You''re not allowed to {action} '
