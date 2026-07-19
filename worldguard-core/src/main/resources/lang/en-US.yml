@@ -144,6 +144,7 @@ commands:
       # {id} = region id
       not-found: '&7(&c&l!&7) No region could be found with the name of &b{id}&7.'
       not-standing-in-region: '&7(&c&l!&7) You''re not standing in a region. Specify an ID if you want to select a specific region.'
+      using-global: 'You''re not standing in any regions. Using the global region for this world instead.'
       current-regions: 'Current regions: '
       click-to-pick: 'Click to pick this region'
       several-regions: '&7(&c&l!&7) You''re standing in several regions (please pick one).'
