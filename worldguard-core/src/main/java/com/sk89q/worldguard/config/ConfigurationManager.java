@@ -62,6 +62,16 @@ public abstract class ConfigurationManager {
             "#   into WorldGuard, paste it into http://yaml-online-parser.appspot.com/\r\n" +
             "#   and see if it gives \"ERROR:\".\r\n" +
             "# - Lines starting with # are comments and so they are ignored.\r\n" +
+            "#\r\n" +
+            "# regions.offline-uuid: how player names are resolved to UUIDs when\r\n" +
+            "#   adding/removing region owners and members.\r\n" +
+            "#     auto     - generate offline UUIDs locally when the server runs in\r\n" +
+            "#                offline mode and is not behind an online-mode proxy;\r\n" +
+            "#                otherwise look names up via Mojang. (default)\r\n" +
+            "#     enabled  - always generate offline UUIDs locally (cracked servers).\r\n" +
+            "#     disabled - always look names up via Mojang (premium servers).\r\n" +
+            "#   Warning: changing this after regions already have owners/members may\r\n" +
+            "#   make a stored name resolve to a different UUID, detaching that player.\r\n" +
             "#\r\n";
 
     public boolean useRegionsCreatureSpawnEvent;
@@ -75,6 +85,7 @@ public abstract class ConfigurationManager {
     public boolean blockInGameOp;
     public boolean migrateRegionsToUuid;
     public boolean keepUnresolvedNames;
+    public String offlineUuidMode = "auto";
     public boolean particleEffects;
     public boolean disablePermissionCache;
     public boolean disableDefaultBypass;

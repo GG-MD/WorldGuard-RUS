@@ -52,6 +52,8 @@ import com.sk89q.worldguard.util.profile.resolver.BukkitPlayerService;
 import com.sk89q.worldguard.util.profile.resolver.CacheForwardingService;
 import com.sk89q.worldguard.util.profile.resolver.CombinedProfileService;
 import com.sk89q.worldguard.util.profile.resolver.HttpRepositoryService;
+import com.sk89q.worldguard.util.profile.resolver.OfflineProfileService;
+import com.sk89q.worldguard.util.profile.resolver.OfflineToggleProfileService;
 import com.sk89q.worldguard.util.profile.resolver.ProfileService;
 import io.papermc.lib.PaperLib;
 import org.bukkit.Bukkit;
@@ -67,6 +69,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
+
+    private static final java.util.logging.Logger logger =
+            java.util.logging.Logger.getLogger(BukkitWorldGuardPlatform.class.getCanonicalName());
 
     private BukkitSessionManager sessionManager;
     private BukkitConfigurationManager configuration;
@@ -245,16 +250,53 @@ public class BukkitWorldGuardPlatform implements WorldGuardPlatform {
 
     @Override
     public ProfileService createProfileService(ProfileCache profileCache) {
-        List<ProfileService> services = new ArrayList<>();
-        if (PaperLib.isPaper()) {
-            // Paper has a shared cache
-            services.add(PaperPlayerService.getInstance());
-        } else {
-            services.add(BukkitPlayerService.getInstance());
+        // The server's own user cache resolves already-seen players to their real
+        // (offline) UUID with the correct name casing; it is the first link in both
+        // chains.
+        ProfileService userCache = PaperLib.isPaper()
+                ? PaperPlayerService.getInstance()
+                : BukkitPlayerService.getInstance();
+
+        // Online chain: fall back to Mojang for unknown names (premium servers).
+        List<ProfileService> onlineServices = new ArrayList<>();
+        onlineServices.add(userCache);
+        onlineServices.add(HttpRepositoryService.forMinecraft());
+        ProfileService online = new CacheForwardingService(
+                new CombinedProfileService(onlineServices), profileCache);
+
+        // Offline chain: derive UUIDs locally for names the user cache does not know,
+        // so cracked servers never contact Mojang and never fail to resolve a name.
+        List<ProfileService> offlineServices = new ArrayList<>();
+        offlineServices.add(userCache);
+        offlineServices.add(OfflineProfileService.getInstance());
+        ProfileService offline = new CacheForwardingService(
+                new CombinedProfileService(offlineServices), profileCache);
+
+        boolean serverIsOffline = isOfflineModeServer();
+        logger.info("Region owner/member name resolution: server offline-mode auto-detected as "
+                + serverIsOffline + " (regions.offline-uuid controls the final behaviour).");
+        return new OfflineToggleProfileService(online, offline, serverIsOffline);
+    }
+
+    /**
+     * Determine whether this server runs in offline mode and is not sitting
+     * behind an online-mode proxy (BungeeCord/Velocity), in which case player
+     * UUIDs are supplied by the proxy and offline UUIDs must not be generated.
+     *
+     * @return true if offline UUIDs are the right default for this server
+     */
+    private static boolean isOfflineModeServer() {
+        if (Bukkit.getServer().getOnlineMode()) {
+            return false;
         }
-        services.add(HttpRepositoryService.forMinecraft());
-        return new CacheForwardingService(new CombinedProfileService(services),
-                profileCache);
+        boolean behindProxy = false;
+        if (PaperLib.isSpigot()) {
+            behindProxy = Bukkit.spigot().getConfig().getBoolean("settings.bungeecord", false);
+        }
+        if (!behindProxy && PaperLib.isPaper()) {
+            behindProxy = Bukkit.spigot().getPaperConfig().getBoolean("proxies.velocity.enabled", false);
+        }
+        return !behindProxy;
     }
 
     @Nullable

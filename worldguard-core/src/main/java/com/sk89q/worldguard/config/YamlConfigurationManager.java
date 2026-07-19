@@ -56,6 +56,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         locale = config.getString("locale", "ru-RU");
         migrateRegionsToUuid = config.getBoolean("regions.uuid-migration.perform-on-next-start", true);
         keepUnresolvedNames = config.getBoolean("regions.uuid-migration.keep-names-that-lack-uuids", true);
+        offlineUuidMode = normalizeOfflineUuidMode(config.getString("regions.offline-uuid", "auto"));
         useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
         disableDefaultBypass = config.getBoolean("regions.disable-bypass-by-default", false);
         announceBypassStatus = config.getBoolean("regions.announce-bypass-status", false);
@@ -128,5 +129,16 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         if (!config.save()) {
             log.severe("Error saving configuration!");
         }
+    }
+
+    private static String normalizeOfflineUuidMode(String value) {
+        if (value == null) {
+            return "auto";
+        }
+        String mode = value.trim().toLowerCase();
+        return switch (mode) {
+            case "enabled", "disabled", "auto" -> mode;
+            default -> "auto";
+        };
     }
 }
