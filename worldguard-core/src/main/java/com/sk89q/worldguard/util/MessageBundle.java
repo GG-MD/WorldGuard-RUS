@@ -25,14 +25,19 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -62,8 +67,16 @@ public final class MessageBundle {
      */
     public static final String DEFAULT_LOCALE = "en-US";
 
+    /**
+     * Internal key that stores the version of a language file, used to decide
+     * whether an on-disk file needs migrating. It is not a user-facing message.
+     */
+    public static final String VERSION_KEY = "lang-version";
+
     private static final Logger log = Logger.getLogger(MessageBundle.class.getCanonicalName());
     private static final Pattern PLACEHOLDER = Pattern.compile("\\{([^{}]+)}");
+    // Matches a "key:" or "key: value" line, capturing indent, key and trailing value.
+    private static final Pattern YAML_ENTRY = Pattern.compile("^(\\s*)([^\\s#:][^:]*):(\\s(.*))?$");
 
     private final Map<String, String> messages;
     private final Map<String, String> builtinDefaults;
@@ -118,6 +131,201 @@ public final class MessageBundle {
         active.putAll(loadFromFile(langFile));
 
         return new MessageBundle(active, builtinDefaults);
+    }
+
+    /**
+     * Migrate the administrator's on-disk language files to match the language
+     * files shipped in the current jar.
+     *
+     * <p>For every existing {@code lang/<locale>.yml} that has a bundled
+     * counterpart, new keys are added and obsolete keys are removed. The
+     * administrator's own message values are preserved, and the comments and
+     * structure of the bundled template are used for the rewritten file (any
+     * comments the administrator added to their own file are not carried over).
+     * A migration only runs when the file's key set differs from the bundled one
+     * or its {@link #VERSION_KEY} is older; otherwise the file is left untouched.
+     * The previous file is copied to a {@code .bak} beside it first. Missing files
+     * are left to {@link #load} to create fresh.</p>
+     *
+     * @param dataFolder the plugin data folder (where {@code config.yml} lives)
+     * @param locale the active locale; migrated together with {@code en-US}
+     */
+    public static void migrate(File dataFolder, String locale) {
+        File langDir = new File(dataFolder, "lang");
+        if (!langDir.isDirectory()) {
+            return;
+        }
+
+        // Migrate the active locale, the default locale and any other locale the
+        // administrator already has a file for.
+        Set<String> locales = new LinkedHashSet<>();
+        if (locale != null && !locale.trim().isEmpty()) {
+            locales.add(locale.trim());
+        }
+        locales.add(DEFAULT_LOCALE);
+        File[] existing = langDir.listFiles((dir, name) -> name.endsWith(".yml"));
+        if (existing != null) {
+            for (File file : existing) {
+                String name = file.getName();
+                locales.add(name.substring(0, name.length() - ".yml".length()));
+            }
+        }
+
+        for (String loc : locales) {
+            try {
+                migrateLocale(langDir, loc);
+            } catch (IOException | RuntimeException e) {
+                log.log(Level.WARNING, "Failed to migrate WorldGuard language file for " + loc, e);
+            }
+        }
+    }
+
+    private static void migrateLocale(File langDir, String locale) throws IOException {
+        File langFile = new File(langDir, locale + ".yml");
+        if (!langFile.exists()) {
+            return;
+        }
+
+        List<String> bundledLines = readBundledLines(locale);
+        if (bundledLines == null) {
+            // No bundled reference for this locale; nothing to migrate against.
+            return;
+        }
+
+        Map<String, String> bundledValues = loadBundled(locale);
+        Map<String, String> userValues = loadFromFile(langFile);
+
+        Set<String> bundledKeys = messageKeys(bundledValues);
+        Set<String> userKeys = messageKeys(userValues);
+        if (userKeys.equals(bundledKeys) && parseVersion(userValues) >= parseVersion(bundledValues)) {
+            return; // already up to date
+        }
+
+        File backup = uniqueBackup(langDir, locale);
+        Files.copy(langFile.toPath(), backup.toPath());
+
+        List<String> merged = rebuild(bundledLines, bundledValues, userValues);
+        Files.write(langFile.toPath(), merged, StandardCharsets.UTF_8);
+
+        Set<String> added = new LinkedHashSet<>(bundledKeys);
+        added.removeAll(userKeys);
+        Set<String> removed = new LinkedHashSet<>(userKeys);
+        removed.removeAll(bundledKeys);
+        log.info("Migrated WorldGuard language file lang/" + locale + ".yml ("
+                + added.size() + " keys added, " + removed.size() + " removed); "
+                + "previous file saved as lang/" + backup.getName());
+    }
+
+    /**
+     * Rebuild a language file from the bundled template line by line, keeping its
+     * comments and structure, but substituting the administrator's own values for
+     * keys they changed. New keys keep the bundled default; obsolete keys are
+     * absent because they are not in the template.
+     */
+    private static List<String> rebuild(List<String> bundledLines,
+                                        Map<String, String> bundledValues,
+                                        Map<String, String> userValues) {
+        List<String> out = new ArrayList<>(bundledLines.size());
+        List<Integer> indents = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+
+        for (String line : bundledLines) {
+            Matcher m = YAML_ENTRY.matcher(line);
+            if (!m.matches()) {
+                out.add(line); // comment, blank line, or anything we don't parse
+                continue;
+            }
+
+            int indent = m.group(1).length();
+            String key = m.group(2).trim();
+            boolean hasValue = m.group(4) != null && !m.group(4).trim().isEmpty();
+
+            // Pop deeper-or-equal levels so the path reflects this line's indent.
+            while (!indents.isEmpty() && indents.get(indents.size() - 1) >= indent) {
+                indents.remove(indents.size() - 1);
+                names.remove(names.size() - 1);
+            }
+            String fullKey = names.isEmpty() ? key : String.join(".", names) + "." + key;
+
+            if (!hasValue) {
+                indents.add(indent);
+                names.add(key);
+                out.add(line);
+                continue;
+            }
+
+            // Keep the internal version line as shipped (the target version).
+            if (!fullKey.equals(VERSION_KEY)
+                    && userValues.containsKey(fullKey)
+                    && !userValues.get(fullKey).equals(bundledValues.get(fullKey))) {
+                out.add(m.group(1) + key + ": " + quote(userValues.get(fullKey)));
+            } else {
+                out.add(line);
+            }
+        }
+        return out;
+    }
+
+    private static String quote(String value) {
+        // Values with newlines/tabs cannot be a single-quoted YAML scalar (a literal
+        // line break there is silently folded away), so use a double-quoted scalar
+        // with escapes for them, matching how the bundled files store such messages.
+        if (value.indexOf('\n') >= 0 || value.indexOf('\r') >= 0 || value.indexOf('\t') >= 0) {
+            String escaped = value
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"")
+                    .replace("\r", "\\r")
+                    .replace("\n", "\\n")
+                    .replace("\t", "\\t");
+            return "\"" + escaped + "\"";
+        }
+        return "'" + value.replace("'", "''") + "'";
+    }
+
+    private static Set<String> messageKeys(Map<String, String> values) {
+        Set<String> keys = new LinkedHashSet<>(values.keySet());
+        keys.remove(VERSION_KEY);
+        return keys;
+    }
+
+    private static int parseVersion(Map<String, String> values) {
+        String raw = values.get(VERSION_KEY);
+        if (raw == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(raw.trim());
+        } catch (NumberFormatException e) {
+            return 0;
+        }
+    }
+
+    private static File uniqueBackup(File langDir, String locale) {
+        int index = 1;
+        File candidate;
+        do {
+            candidate = new File(langDir, locale + "-" + index + ".yml.bak");
+            index++;
+        } while (candidate.exists());
+        return candidate;
+    }
+
+    private static List<String> readBundledLines(String locale) {
+        InputStream in = MessageBundle.class.getResourceAsStream(resourcePath(locale));
+        if (in == null) {
+            return null;
+        }
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            log.log(Level.WARNING, "Could not read bundled language resource for " + locale, e);
+            return null;
+        }
+        return lines;
     }
 
     /**

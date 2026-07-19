@@ -111,6 +111,7 @@ public final class WorldGuard {
     public void reloadMessages() {
         File dataFolder = getPlatform().getConfigDir().toFile();
         String locale = getPlatform().getGlobalStateManager().locale;
+        MessageBundle.migrate(dataFolder, locale);
         messages = MessageBundle.load(dataFolder, locale);
     }
 

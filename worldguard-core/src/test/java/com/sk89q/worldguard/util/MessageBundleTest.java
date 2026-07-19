@@ -29,6 +29,8 @@ import java.nio.file.Path;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class MessageBundleTest {
 
@@ -84,5 +86,71 @@ public class MessageBundleTest {
         String title = bundle.get("commands.region.info.title");
         assertNotEquals("commands.region.info.title", title, "key must resolve");
         assertNotEquals("Region Info", title, "ru-RU must override the English default");
+    }
+
+    @Test
+    public void migrateAddsNewKeysRemovesObsoleteAndKeepsEdits(@TempDir Path dataFolder) throws Exception {
+        Path langDir = dataFolder.resolve("lang");
+        Files.createDirectories(langDir);
+        Path langFile = langDir.resolve("en-US.yml");
+        // An out-of-date file: old version, a hand-edited value, an obsolete key,
+        // and missing most of the keys the bundled file has.
+        Files.writeString(langFile,
+                "lang-version: 0\n"
+                        + "commands:\n"
+                        + "  fire:\n"
+                        + "    already-disabled: 'CUSTOM VALUE'\n"
+                        + "    obsolete-key: 'gone'\n");
+
+        MessageBundle.migrate(dataFolder.toFile(), "en-US");
+
+        String migrated = Files.readString(langFile);
+        // Administrator's edit is preserved.
+        assertTrue(migrated.contains("CUSTOM VALUE"), "hand-edited value must be kept");
+        // Obsolete key is dropped, new keys are added, version is bumped.
+        assertFalse(migrated.contains("obsolete-key"), "obsolete key must be removed");
+        assertTrue(migrated.contains("already-enabled"), "new keys must be added");
+        assertTrue(migrated.contains("lang-version: 1"), "version must be updated");
+        // A backup of the previous file is created.
+        assertTrue(Files.exists(langDir.resolve("en-US-1.yml.bak")), "backup must be written");
+
+        // The kept value is loadable through the bundle.
+        MessageBundle bundle = MessageBundle.load(dataFolder.toFile(), "en-US");
+        assertEquals("CUSTOM VALUE", bundle.get("commands.fire.already-disabled"));
+    }
+
+    @Test
+    public void migrateKeepsNewlinesInEditedMultilineValues(@TempDir Path dataFolder) throws Exception {
+        Path langDir = dataFolder.resolve("lang");
+        Files.createDirectories(langDir);
+        Path langFile = langDir.resolve("en-US.yml");
+        // Out-of-date file whose only key is a hand-edited multiline message.
+        Files.writeString(langFile,
+                "lang-version: 0\n"
+                        + "commands:\n"
+                        + "  region:\n"
+                        + "    store:\n"
+                        + "      migrate-dangerous: \"First line\\nSecond line\"\n");
+
+        MessageBundle.migrate(dataFolder.toFile(), "en-US");
+
+        // The newline in the administrator's edit must survive the round-trip.
+        MessageBundle bundle = MessageBundle.load(dataFolder.toFile(), "en-US");
+        assertEquals("First line\nSecond line",
+                bundle.get("commands.region.store.migrate-dangerous"));
+    }
+
+    @Test
+    public void migrateLeavesUpToDateFileUntouched(@TempDir Path dataFolder) throws Exception {
+        // A fresh file created by load() is already up to date and must not be rewritten.
+        MessageBundle.load(dataFolder.toFile(), "en-US");
+        Path langFile = dataFolder.resolve("lang").resolve("en-US.yml");
+        String before = Files.readString(langFile);
+
+        MessageBundle.migrate(dataFolder.toFile(), "en-US");
+
+        assertEquals(before, Files.readString(langFile), "up-to-date file must not change");
+        assertFalse(Files.exists(dataFolder.resolve("lang").resolve("en-US-1.yml.bak")),
+                "no backup should be created when nothing changes");
     }
 }

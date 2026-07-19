@@ -24,6 +24,11 @@
 # itself, so those labels/buttons are left without a prefix on purpose.
 #
 
+# Internal version of this language file. Do not edit: WorldGuard uses it to
+# migrate your file when the plugin updates (adding new keys and removing
+# obsolete ones while keeping your edits). Your old file is backed up first.
+lang-version: 1
+
 commands:
   fire:
     # {world} = world name, {actor} = name of the sender
