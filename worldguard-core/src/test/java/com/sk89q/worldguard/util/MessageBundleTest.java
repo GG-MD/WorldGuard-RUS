@@ -43,14 +43,21 @@ public class MessageBundleTest {
         MessageBundle bundle = MessageBundle.bundledOnly();
         assertEquals("Region: ", bundle.get("commands.region.info.region-label"));
         assertEquals("Region Info", bundle.get("commands.region.info.title"));
-        assertEquals("God mode disabled!", bundle.get("commands.ungod.self"));
+        assertEquals("(none)", bundle.get("commands.region.info.none"));
     }
 
     @Test
     public void substitutesPlaceholders() {
         MessageBundle bundle = MessageBundle.bundledOnly();
-        assertEquals("God enabled by Steve.",
-                bundle.format("commands.god.by-other", "actor", "Steve"));
+        assertEquals("Adding region 'spawn'",
+                bundle.format("commands.region.define.task-adding", "id", "spawn"));
+    }
+
+    @Test
+    public void getSectionReturnsLeafEntries() {
+        MessageBundle bundle = MessageBundle.bundledOnly();
+        // The usage-args section is used to translate command-usage placeholders.
+        assertEquals("<flag>", bundle.getSection("plugin.usage-args").get("<flag>"));
     }
 
     @Test

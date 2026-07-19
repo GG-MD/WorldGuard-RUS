@@ -75,6 +75,7 @@ import com.sk89q.worldguard.protection.managers.storage.RegionDriver;
 import com.sk89q.worldguard.protection.managers.storage.file.DirectoryYamlDriver;
 import com.sk89q.worldguard.protection.managers.storage.sql.SQLDriver;
 import com.sk89q.worldguard.protection.regions.ProtectedRegion;
+import com.sk89q.worldguard.util.MessageBundle;
 import com.sk89q.worldguard.util.logging.RecordMessagePrefixer;
 import io.papermc.lib.PaperLib;
 import io.papermc.paper.ServerBuildInfo;
@@ -97,7 +98,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -324,10 +327,9 @@ public class WorldGuardPlugin extends JavaPlugin {
         } catch (CommandPermissionsException e) {
             sender.sendMessage(ChatColor.RED + WorldGuard.getInstance().getMessages().get("plugin.no-permission"));
         } catch (MissingNestedCommandException e) {
-            sender.sendMessage(ChatColor.RED + e.getUsage());
+            sendCommandUsage(sender, e.getUsage());
         } catch (CommandUsageException e) {
-            sender.sendMessage(ChatColor.RED + e.getMessage());
-            sender.sendMessage(ChatColor.RED + e.getUsage());
+            sendCommandUsage(sender, e.getUsage());
         } catch (WrappedCommandException e) {
             sender.sendMessage(ChatColor.RED + e.getCause().getMessage());
         } catch (CommandException e) {
@@ -335,6 +337,37 @@ public class WorldGuardPlugin extends JavaPlugin {
         }
 
         return true;
+    }
+
+    /**
+     * Send a command-usage hint to the sender, styled like the rest of the
+     * plugin's messages.
+     *
+     * <p>A localized prefix line (see the {@code plugin.command-usage} message)
+     * is printed first, followed by the actual usage string in gold. Argument
+     * placeholders such as {@code <flag>} are translated into the active
+     * language using the {@code plugin.usage-args} section so the hint matches
+     * the language of the rest of the interface.</p>
+     *
+     * @param sender the command sender to send the hint to
+     * @param rawUsage the raw usage string produced by the command framework
+     */
+    private void sendCommandUsage(CommandSender sender, String rawUsage) {
+        MessageBundle messages = WorldGuard.getInstance().getMessages();
+        sender.sendMessage(messages.get("plugin.command-usage"));
+
+        String usage = ChatColor.stripColor(rawUsage);
+        Map<String, String> args = messages.getSection("plugin.usage-args");
+        if (!args.isEmpty()) {
+            // Replace longer tokens first so that, for example, "<owners...>"
+            // is handled before a hypothetical "<owner>" substring.
+            List<String> tokens = new ArrayList<>(args.keySet());
+            tokens.sort((a, b) -> b.length() - a.length());
+            for (String token : tokens) {
+                usage = usage.replace(token, args.get(token));
+            }
+        }
+        sender.sendMessage(" " + ChatColor.GOLD + usage);
     }
 
     /**

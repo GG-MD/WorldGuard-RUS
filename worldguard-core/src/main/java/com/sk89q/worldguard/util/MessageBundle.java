@@ -139,6 +139,37 @@ public final class MessageBundle {
     }
 
     /**
+     * Get all key/value entries that live directly or indirectly under a dotted
+     * prefix, with the prefix stripped from the returned keys.
+     *
+     * <p>For example, {@code getSection("plugin.usage-args")} returns a map whose
+     * keys are the leaf names (such as {@code "<flag>"}) and whose values are the
+     * corresponding messages. Values are returned raw, without colour
+     * processing, since sections are typically used for token substitution rather
+     * than display. The built-in defaults are included first and then overlaid by
+     * the active locale, so a partially translated section still resolves every
+     * entry.</p>
+     *
+     * @param prefix the dotted section prefix, without a trailing dot
+     * @return a map of leaf key to value, empty if the section is absent
+     */
+    public Map<String, String> getSection(String prefix) {
+        String dotted = prefix + ".";
+        Map<String, String> out = new LinkedHashMap<>();
+        for (Map.Entry<String, String> entry : builtinDefaults.entrySet()) {
+            if (entry.getKey().startsWith(dotted)) {
+                out.put(entry.getKey().substring(dotted.length()), entry.getValue());
+            }
+        }
+        for (Map.Entry<String, String> entry : messages.entrySet()) {
+            if (entry.getKey().startsWith(dotted)) {
+                out.put(entry.getKey().substring(dotted.length()), entry.getValue());
+            }
+        }
+        return out;
+    }
+
+    /**
      * Translate legacy {@code &} colour/format codes (e.g. {@code &c}, {@code &l})
      * in a message into the section-sign codes the client renders.
      *
