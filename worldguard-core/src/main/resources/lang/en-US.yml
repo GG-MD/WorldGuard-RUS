@@ -27,7 +27,7 @@
 # Internal version of this language file. Do not edit: WorldGuard uses it to
 # migrate your file when the plugin updates (adding new keys and removing
 # obsolete ones while keeping your edits). Your old file is backed up first.
-lang-version: 1
+lang-version: 2
 
 commands:
   fire:

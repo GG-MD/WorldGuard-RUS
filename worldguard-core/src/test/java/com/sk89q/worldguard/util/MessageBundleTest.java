@@ -110,7 +110,7 @@ public class MessageBundleTest {
         // Obsolete key is dropped, new keys are added, version is bumped.
         assertFalse(migrated.contains("obsolete-key"), "obsolete key must be removed");
         assertTrue(migrated.contains("already-enabled"), "new keys must be added");
-        assertTrue(migrated.contains("lang-version: 1"), "version must be updated");
+        assertTrue(migrated.contains("lang-version: 2"), "version must be updated");
         // A backup of the previous file is created.
         assertTrue(Files.exists(langDir.resolve("en-US-1.yml.bak")), "backup must be written");
 
