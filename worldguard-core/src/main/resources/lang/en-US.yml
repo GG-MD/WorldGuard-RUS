@@ -152,6 +152,9 @@ commands:
       using-global: 'You''re not standing in any regions. Using the global region for this world instead.'
       current-regions: 'Current regions: '
       click-to-pick: 'Click to pick this region'
+      # {count} = number of regions the player can't access
+      hidden-regions-suffix: ', and {count} hidden regions'
+      hidden-regions: '{count} hidden regions'
       several-regions: '&7(&c&l!&7) You''re standing in several regions (please pick one).'
       select-area-first: '&7(&c&l!&7) Please select an area first. Use WorldEdit to make a selection! (see: https://worldedit.enginehub.org/en/latest/usage/regions/selections/).'
       already-exists: '&7(&c&l!&7) A region with that name already exists. Please choose another name.'
