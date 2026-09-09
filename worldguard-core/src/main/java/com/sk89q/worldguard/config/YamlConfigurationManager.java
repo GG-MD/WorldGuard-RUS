@@ -58,6 +58,7 @@ public abstract class YamlConfigurationManager extends ConfigurationManager {
         keepUnresolvedNames = config.getBoolean("regions.uuid-migration.keep-names-that-lack-uuids", true);
         offlineUuidMode = normalizeOfflineUuidMode(config.getString("regions.offline-uuid", "auto"));
         useRegionsCreatureSpawnEvent = config.getBoolean("regions.use-creature-spawn-event", true);
+        useRegionsPreCreatureSpawnEvent = config.getBoolean("regions.use-pre-creature-spawn-event", true);
         disableDefaultBypass = config.getBoolean("regions.disable-bypass-by-default", false);
         announceBypassStatus = config.getBoolean("regions.announce-bypass-status", false);
 
